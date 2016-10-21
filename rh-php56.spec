@@ -13,8 +13,8 @@
 
 Summary:       Package that installs PHP 5.6
 Name:          %scl_name
-Version:       2.0
-Release:       6%{?dist}
+Version:       2.3
+Release:       1%{?dist}
 Group:         Development/Languages
 License:       GPLv2+
 
@@ -108,6 +108,12 @@ chmod a+x h2m_helper
 
 # generate the man page
 help2man -N --section 7 ./h2m_helper -o %{scl_name}.7
+# Fix single quotes in man page. See RHBZ#1219527
+#
+# http://lists.gnu.org/archive/html/groff/2008-06/msg00001.html suggests that
+# using "'" for quotes is correct, but the current implementation of man in 6
+# mangles it when rendering.
+sed -i "s/'/\\\\(aq/g" %{scl_name}.7
 
 
 %install
@@ -189,6 +195,9 @@ restorecon -R %{_localstatedir} &>/dev/null || :
 
 
 %changelog
+* Tue Jul 26 2016 Remi Collet <rcollet@redhat.com> 2.3.1
+- fix syntax in man page #1219525
+
 * Mon Mar 16 2015 Remi Collet <rcollet@redhat.com> 2.0-6
 - rebuild to remove scls directory #1200056
 - fix incorrect selinux contexts #1194337
